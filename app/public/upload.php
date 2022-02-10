@@ -5,7 +5,8 @@ function setup_temp_file($fileName) {
     copy($fileName, "/var/www/html/uploads/" . md5_file($_FILES["uploadedFile"]["tmp_name"]) . ".csv");
     $headers = array("КОД", "НАЗВАНИЕ", "Error");
     $temp = fopen("/var/www/html/uploads/".md5_file($_FILES["uploadedFile"]["tmp_name"]) . ".csv", 'w');
-    fputcsv($temp, $headers);
+    fputs($temp, chr(0xEF) . chr(0xBB) . chr(0xBF));
+    fputcsv($temp, $headers, ';');
     return $temp;
 }
 
@@ -48,14 +49,14 @@ function upload_csv($conn)
             $file = fopen($file_name, "r");
             $temp = setup_temp_file($file_name);
             $first_line = true;
-            while (($column = fgetcsv($file, 10000, ",")) !== FALSE) {
+            while (($column = fgetcsv($file, 10000, ";")) !== FALSE) {
                 if($first_line) {
                     $first_line = false;
                     continue;
                 }
                 $msg = validate_data($column);
                 $column[] = $msg;
-                fputcsv($temp, $column);
+                fputcsv($temp, $column, ";");
                 if (strlen($msg) === 0) {
                     $sql_insert = "INSERT INTO catalogues (code, title) VALUES ('" . $column[0] . "', '" . $column[1] . "') ON DUPLICATE KEY UPDATE code='" . $column[0] . "', title='" . $column[1] ."'";
                     $result = mysqli_query($conn, $sql_insert);
