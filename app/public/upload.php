@@ -112,7 +112,7 @@ $pass = "fnc";
 $db_name = "task";
 
 $sql = "CREATE TABLE IF NOT EXISTS catalogues (
-    code VARCHAR(255) UNIQUE,
+    code VARCHAR(255) NOT NULL PRIMARY KEY,
     title VARCHAR(255) NOT NULL
 )";
 
